@@ -1,0 +1,17 @@
+<nav class="navbar bg-success navbar-dark sticky-top shadow">
+    <div class="container-fluid">
+        <div>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex flex-row">
+                <li class="nav-item me-3">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/tienda/productos/">Productos</a>
+                </li>
+                <li class="nav-item me-3">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/tienda/usuarios/">Usuarios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/tienda/pedidos/">Pedidos</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

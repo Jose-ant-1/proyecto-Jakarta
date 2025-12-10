@@ -21,13 +21,17 @@ public class UsuariosServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+// UsuariosServlet.java (Método doGet corregido)
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         UsuariosDAO usuariosDAO = new UsuariosDAOImpl();
-        RequestDispatcher dispatcher;
+        RequestDispatcher dispatcher = null; // Inicializar a null
 
-        String pathInfo =  request.getPathInfo();
+        String pathInfo = request.getPathInfo();
+
+        // /tienda/usuarios/ - /tienda/usuarios (Listado general)
 
         if (pathInfo == null || "/".equals(pathInfo)) {
             List<Usuario> usuarios = usuariosDAO.getAll();
@@ -36,22 +40,12 @@ public class UsuariosServlet extends HttpServlet {
         } else {
             pathInfo = pathInfo.replaceAll("/$", "");
             String[] pathsParts = pathInfo.split("/");
+
+            // /tienda/usuarios/crear
             if (pathsParts.length == 2 && "crear".equals(pathsParts[1])) {
                 dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/crear-usuario.jsp");
-            } else if (pathsParts.length == 2) {
-                try {
-                    int id = Integer.parseInt(pathsParts[1]);
-                    Optional<Usuario> usuarioOpt = usuariosDAO.find(id);
-                    if (usuarioOpt.isPresent()) {
-                        request.setAttribute("usuario", usuarioOpt.get());
-                        dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/detalle-usuario.jsp");
-                    } else {
-                        dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
-                    }
 
-                } catch (NumberFormatException e) {
-                    dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
-                }
+                // /tienda/usuarios/editar/{id} (Vista de Edición)
             } else if (pathsParts.length == 3 && "editar".equals(pathsParts[1])) {
                 try {
                     int id = Integer.parseInt(pathsParts[2]);
@@ -60,16 +54,53 @@ public class UsuariosServlet extends HttpServlet {
                         request.setAttribute("usuario", usuarioOpt.get());
                         dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/editar-usuario.jsp");
                     } else {
+                        // ID válido, pero usuario no existe -> Volver al listado
                         dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
                     }
                 } catch (NumberFormatException e) {
+                    // ID no es un número -> Volver al listado
                     dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
                 }
+
+                // ----------------------------------------------------------------------------
+                // 4. Caso: /tienda/usuarios/{id} (Ver Detalle)
+                // ----------------------------------------------------------------------------
+            } else if (pathsParts.length == 2) {
+                try {
+                    int id = Integer.parseInt(pathsParts[1]);
+                    Optional<Usuario> usuarioOpt = usuariosDAO.find(id);
+                    if (usuarioOpt.isPresent()) {
+                        request.setAttribute("usuario", usuarioOpt.get());
+                        dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/detalle-usuario.jsp");
+                    } else {
+                        // ID válido, pero usuario no existe -> Volver al listado
+                        dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
+                    }
+                } catch (NumberFormatException e) {
+                    // Si pathsParts[1] no es un número (ej: /tienda/usuarios/otro) -> Volver al listado
+                    dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
+                }
+
+                // ----------------------------------------------------------------------------
+                // 5. Caso: Ruta desconocida
+                // ----------------------------------------------------------------------------
             } else {
+                // Cualquier otra ruta no manejada, por defecto volvemos al listado
+                List<Usuario> usuarios = usuariosDAO.getAll();
+                request.setAttribute("listaUsuarios", usuarios);
                 dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
             }
         }
-        dispatcher.forward(request, response);
+
+        // --------------------------------------------------------------------------------
+        // Llamada ÚNICA al forward (Debe ser la última línea)
+        // --------------------------------------------------------------------------------
+        if (dispatcher != null) {
+            dispatcher.forward(request, response);
+        } else {
+            // En caso de que, por alguna razón, dispatcher siga siendo null (caso improbable con la lógica anterior)
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error interno del servlet.");
+        }
     }
 
     //REVISAR EDITAR
@@ -90,7 +121,7 @@ public class UsuariosServlet extends HttpServlet {
                 throw new RuntimeException(e);
             }
             usuariosDAO.create(usuario);
-            response.sendRedirect("/tienda/usuarios");
+            response.sendRedirect(request.getContextPath() + "/tienda/usuarios");
             return;
 
         } else if (pathInfo.startsWith("/editar")) {
@@ -118,7 +149,7 @@ public class UsuariosServlet extends HttpServlet {
             } catch (NumberFormatException | NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
-            response.sendRedirect("/tienda/usuarios");
+            response.sendRedirect(request.getContextPath() + "/tienda/usuarios");
             return;
         } else if (pathInfo.startsWith("/eliminar/")) {
             try {
@@ -127,7 +158,7 @@ public class UsuariosServlet extends HttpServlet {
             } catch (NumberFormatException e) {
                 throw new RuntimeException(e);
             }
-            response.sendRedirect("/tienda/usuarios");
+            response.sendRedirect(request.getContextPath() + "/tienda/usuarios");
             return;
         }
 
