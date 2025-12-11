@@ -7,16 +7,36 @@
 
 <div class="container mt-5 mb-5">
 
+    <%
+        // *****************************************************************
+        // 1. LÓGICA DE CONTROL DE ACCESO (ADMINISTRADOR) - SOLUCIÓN FINAL
+        // Se asume que el valor en la sesión es EXACTAMENTE "Administrador".
+        // *****************************************************************
+
+        String rolUsuario = (String) session.getAttribute("rol");
+        boolean esAdministrador = false; // Inicialmente, no es administrador
+
+        if (rolUsuario != null) {
+            // SOLUCIÓN: Comprobamos si el rol de la sesión es IGUAL a "Administrador" (sensible a mayúsculas)
+            esAdministrador = "Administrador".equals(rolUsuario);
+        }
+    %>
     <div class="row align-items-center mb-3">
         <div class="col-md-6">
             <h1 class="mb-0">Listado de Productos</h1>
         </div>
         <div class="col-md-6 text-end">
+
+            <%-- ***************************************************************** --%>
+            <%-- 2. RESTRICCIÓN: Botón 'Crear Nuevo Producto' solo para Administrador --%>
+            <%-- ***************************************************************** --%>
+            <% if (esAdministrador) { %>
             <form action="${pageContext.request.contextPath}/tienda/productos/crear" method="get" class="d-inline">
                 <button type="submit" class="btn btn-success">
                     Crear Nuevo Producto
                 </button>
             </form>
+            <% } %>
         </div>
     </div>
 
@@ -68,13 +88,17 @@
                 <div class="card-footer bg-light">
                     <div class="d-flex justify-content-between align-items-center">
 
-                        <%-- Botón de Ver Detalle --%>
+                        <%-- Botón de Ver Detalle (Siempre visible) --%>
                         <form action="<%=contextPath%>/tienda/productos/<%=producto.getId()%>" method="get" class="me-1">
                             <button type="submit" class="btn btn-primary btn-sm">
                                 Ver Detalle
                             </button>
                         </form>
 
+                        <%-- *********************************************************************** --%>
+                        <%-- 3. RESTRICCIÓN: Botones 'Editar' y 'Eliminar' solo para Administrador --%>
+                        <%-- *********************************************************************** --%>
+                        <% if (esAdministrador) { %>
                         <div class="btn-group">
                             <%-- Botón de Editar --%>
                             <form action="<%=contextPath%>/tienda/productos/editar/<%=producto.getId()%>" method="get" class="me-1">
@@ -90,6 +114,7 @@
                                 </button>
                             </form>
                         </div>
+                        <% } %>
                     </div>
                 </div>
             </div>

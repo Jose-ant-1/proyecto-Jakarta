@@ -198,6 +198,7 @@ public class UsuariosServlet extends HttpServlet {
                 // Login Exitoso: Establecer la sesión
                 request.getSession().setAttribute("usuarioLogueado", optUsuario.get());
                 System.out.println("✅ Usuario logueado: " + optUsuario.get().getNombre());
+                request.getSession().setAttribute("rol", optUsuario.get().getRol());
 
                 // 2. Corregir la redirección (ver punto 2)
                 response.sendRedirect(request.getContextPath() + "/tienda/productos");
