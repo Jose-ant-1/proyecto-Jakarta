@@ -62,9 +62,7 @@ public class UsuariosServlet extends HttpServlet {
                     dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
                 }
 
-                // ----------------------------------------------------------------------------
-                // 4. Caso: /tienda/usuarios/{id} (Ver Detalle)
-                // ----------------------------------------------------------------------------
+                // /tienda/usuarios/{id} (Ver Detalle)
             } else if (pathsParts.length == 2) {
                 try {
                     int id = Integer.parseInt(pathsParts[1]);
@@ -81,9 +79,8 @@ public class UsuariosServlet extends HttpServlet {
                     dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
                 }
 
-                // ----------------------------------------------------------------------------
-                // 5. Caso: Ruta desconocida
-                // ----------------------------------------------------------------------------
+                // Ruta desconocida
+
             } else {
                 // Cualquier otra ruta no manejada, por defecto volvemos al listado
                 List<Usuario> usuarios = usuariosDAO.getAll();
@@ -92,9 +89,7 @@ public class UsuariosServlet extends HttpServlet {
             }
         }
 
-        // --------------------------------------------------------------------------------
-        // Llamada ÚNICA al forward (Debe ser la última línea)
-        // --------------------------------------------------------------------------------
+        // Llamada  al forward (Debe ser la última línea)
         if (dispatcher != null) {
             dispatcher.forward(request, response);
         } else {

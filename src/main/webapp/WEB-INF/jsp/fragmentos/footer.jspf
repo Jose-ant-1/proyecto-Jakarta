@@ -1,7 +1,7 @@
 </main>
 
 <footer class="bg-dark text-white text-center p-3 mt-5 fixed-bottom">
-    &copy; <%= java.time.Year.now() %> Tienda Informática | Derechos Reservados
+    &copy; <%= java.time.Year.now() %> Tienda 3D | Derechos Reservados
 </footer>
 
 </body>

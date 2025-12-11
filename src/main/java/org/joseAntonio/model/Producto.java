@@ -5,6 +5,7 @@ public class Producto {
     private int id;
     private String nombre;
     private double precio;
+    private String imagenUrl;
 
     public void setId(int id) {
         this.id = id;
@@ -27,6 +28,13 @@ public class Producto {
         return precio;
     }
 
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
+    }
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Producto)) return false;
@@ -36,9 +44,5 @@ public class Producto {
         return getId() == producto.getId();
     }
 
-    @Override
-    public int hashCode() {
-        return getId();
-    }
 
 }

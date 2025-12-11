@@ -19,11 +19,12 @@ public class ProductoDAOImpl extends AbstractDAOImpl implements ProductoDAO {
         try {
             conn = connectDB();
 
-            ps = conn.prepareStatement("insert into productos (nombre, precio) values (?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps = conn.prepareStatement("insert into productos (nombre, precio, imagen_url) values (?, ?,?)", Statement.RETURN_GENERATED_KEYS);
 
             int idx = 1;
             ps.setString(idx++, producto.getNombre());
             ps.setDouble(idx++, producto.getPrecio());
+            ps.setString(idx++, producto.getImagenUrl());
 
             int rows =  ps.executeUpdate();
             if (rows == 0)
@@ -60,6 +61,7 @@ public class ProductoDAOImpl extends AbstractDAOImpl implements ProductoDAO {
                 producto.setId(rs.getInt(idx++));
                 producto.setNombre(rs.getString(idx++));
                 producto.setPrecio(rs.getDouble(idx++));
+                producto.setImagenUrl(rs.getString(idx++));
                 productos.add(producto);
             }
 
@@ -93,6 +95,7 @@ public class ProductoDAOImpl extends AbstractDAOImpl implements ProductoDAO {
                 producto.setId(rs.getInt(idx++));
                 producto.setNombre(rs.getString(idx++));
                 producto.setPrecio(rs.getDouble(idx++));
+                producto.setImagenUrl(rs.getString(idx++));
                 return Optional.of(producto);
             }
         } catch (SQLException | ClassNotFoundException e) {

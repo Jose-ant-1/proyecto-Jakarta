@@ -32,7 +32,7 @@
 
     <header class="p-3">
         <div class="head1">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/index.jsp">TIENDA INFORMATICA</a>
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/index.jsp">TIENDA 3D</a>
         </div>
 
     </header>
