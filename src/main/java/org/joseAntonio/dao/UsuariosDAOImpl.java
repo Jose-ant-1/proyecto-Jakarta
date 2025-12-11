@@ -156,4 +156,41 @@ public class UsuariosDAOImpl extends AbstractDAOImpl implements UsuariosDAO {
         }
 
     }
+
+    @Override
+    public Optional<Usuario> encontrarPorNombreYContrasenia(String nombre, String contrasenia) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = connectDB();
+            // 1. Buscamos por el nombre y la columna 'password' de la base de datos.
+            ps = conn.prepareStatement("SELECT * FROM usuarios WHERE nombre=? AND password=?");
+
+            int idx = 1;
+            ps.setString(idx++, nombre);
+            ps.setString(idx++, contrasenia); // Nota: Esto asume que la contraseña está en texto plano, ¡Recuerda el hashing!
+
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Usuario usuario = new Usuario();
+                idx = 1;
+                usuario.setId(rs.getInt(idx++));
+                usuario.setNombre(rs.getString(idx++));
+                usuario.setRol(rs.getString(idx++));
+                // Aunque no es necesario devolver la contraseña, la asignamos para completar el objeto
+                usuario.setContrasenia(rs.getString(idx));
+                return Optional.of(usuario);
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeDb(conn, ps, rs);
+        }
+
+        return Optional.empty();
+    }
+
 }

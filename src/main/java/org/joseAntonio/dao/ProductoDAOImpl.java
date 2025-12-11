@@ -114,10 +114,11 @@ public class ProductoDAOImpl extends AbstractDAOImpl implements ProductoDAO {
 
         try {
             conn = connectDB();
-            ps = conn.prepareStatement("update productos set nombre = ?, precio = ? where id = ?");
+            ps = conn.prepareStatement("update productos set nombre = ?, precio = ?, imagen_url = ? where id = ?");
             int idx = 1;
             ps.setString(idx++, producto.getNombre());
             ps.setDouble(idx++, producto.getPrecio());
+            ps.setString(idx++, producto.getImagenUrl());
             ps.setInt(idx++, producto.getId());
 
             int rows =  ps.executeUpdate();
@@ -176,6 +177,7 @@ public class ProductoDAOImpl extends AbstractDAOImpl implements ProductoDAO {
                 producto.setId(rs.getInt(idx++));
                 producto.setNombre(rs.getString(idx++));
                 producto.setPrecio(rs.getDouble(idx++));
+                producto.setImagenUrl(rs.getString(idx++));
                 productos.add(producto);
             }
 

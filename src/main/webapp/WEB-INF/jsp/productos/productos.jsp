@@ -25,58 +25,80 @@
     <%
         // Obtener la lista de productos del request (cargada por ProductosServlet.doGet)
         List<Producto> listaProductos = (List<Producto>)request.getAttribute("listaProductos");
+        String contextPath = request.getContextPath(); // Definir contextPath una vez
 
         // Verificar si la lista no es nula y contiene elementos
         if (listaProductos != null && !listaProductos.isEmpty()) {
     %>
 
-    <table class="table table-striped table-hover shadow-sm">
-        <thead class="table-dark">
-        <tr>
-            <th scope="col" style="width: 10%;">ID</th>
-            <th scope="col" style="width: 40%;">Nombre</th>
-            <th scope="col" style="width: 20%;">Precio (€)</th>
-            <th scope="col" style="width: auto;">Acciones</th>
-        </tr>
-        </thead>
-        <tbody>
+    <%-- CUADRÍCULA DE PRODUCTOS (Usando clases de Bootstrap: row y col) --%>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
         <%
             // Iterar sobre la lista de productos
             for (Producto producto: listaProductos) {
-                String contextPath = request.getContextPath();
         %>
-        <tr>
-            <td><%=producto.getId()%></td>
-            <td><%=producto.getNombre()%></td>
-            <td><%=String.format("%.2f", producto.getPrecio())%></td>
-            <td>
-                <div style="display: flex; flex-direction: row; gap: 5px;">
 
-                    <form action="<%=contextPath%>/tienda/productos/<%=producto.getId()%>" method="get">
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            Ver
-                        </button>
-                    </form>
+        <%-- Inicio de la Tarjeta/Cuadro para cada producto. Ocupa 4 columnas en desktop (3 por fila) --%>
+        <div class="col">
+            <div class="card h-100 shadow-sm">
 
-                    <form action="<%=contextPath%>/tienda/productos/editar/<%=producto.getId()%>" method="get">
-                        <button type="submit" class="btn btn-warning btn-sm">
-                            Editar
-                        </button>
-                    </form>
-
-                    <form action="<%=contextPath%>/tienda/productos/eliminar/<%=producto.getId()%>" method="post">
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            Eliminar
-                        </button>
-                    </form>
+                <%-- 1. Zona de Imagen --%>
+                <%
+                    String imagenUrl = producto.getImagenUrl();
+                    if (imagenUrl != null && !imagenUrl.isEmpty()) {
+                %>
+                <img src="<%= imagenUrl %>" class="card-img-top"
+                     alt="<%= producto.getNombre() %>"
+                     style="height: 200px; object-fit: contain; padding: 10px;">
+                <% } else { %>
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <span class="text-muted">No Image Available</span>
                 </div>
-            </td>
-        </tr>
+                <% } %>
+
+                <div class="card-body">
+                    <%-- 2. Nombre y ID --%>
+                    <h5 class="card-title"><%= producto.getNombre()%></h5>
+
+                    <%-- 3. Precio --%>
+                    <h4 class="text-primary mb-3"><%=String.format("%.2f €", producto.getPrecio())%></h4>
+                </div>
+
+                <%-- 4. Botones de Acción --%>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <%-- Botón de Ver Detalle --%>
+                        <form action="<%=contextPath%>/tienda/productos/<%=producto.getId()%>" method="get" class="me-1">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                Ver Detalle
+                            </button>
+                        </form>
+
+                        <div class="btn-group">
+                            <%-- Botón de Editar --%>
+                            <form action="<%=contextPath%>/tienda/productos/editar/<%=producto.getId()%>" method="get" class="me-1">
+                                <button type="submit" class="btn btn-warning btn-sm">
+                                    Editar
+                                </button>
+                            </form>
+
+                            <%-- Botón de Eliminar (Confirmación removida) --%>
+                            <form action="<%=contextPath%>/tienda/productos/eliminar/<%=producto.getId()%>" method="post">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <%
-            }
+            } // Fin del bucle for
         %>
-        </tbody>
-    </table>
+    </div>
+    <%-- Fin de la Cuadrícula --%>
 
     <%
     } else {

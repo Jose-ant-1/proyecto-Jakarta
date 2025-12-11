@@ -93,6 +93,7 @@ public class ProductosServlet extends HttpServlet {
 
             String nombre = request.getParameter("nombre");
             String precioStr = request.getParameter("precio");
+            String imagenUrl = request.getParameter("imagenUrl");
 
             try {
                 double precio = Double.parseDouble(precioStr);
@@ -100,7 +101,7 @@ public class ProductosServlet extends HttpServlet {
                 Producto nuevoProducto = new Producto();
                 nuevoProducto.setNombre(nombre);
                 nuevoProducto.setPrecio(precio);
-
+                nuevoProducto.setImagenUrl(imagenUrl);
                 productoDAO.create(nuevoProducto);
 
                 // Redirigir al listado principal (Post-Redirect-Get)
@@ -135,11 +136,13 @@ public class ProductosServlet extends HttpServlet {
                 // Actualizar campos
                 String nuevoNombre = request.getParameter("nombre");
                 String nuevoPrecioStr = request.getParameter("precio");
+                String nuevoImagenUrl = request.getParameter("imagenUrl");
 
                 double nuevoPrecio = Double.parseDouble(nuevoPrecioStr);
 
                 productoAEditar.setNombre(nuevoNombre);
                 productoAEditar.setPrecio(nuevoPrecio);
+                productoAEditar.setImagenUrl(nuevoImagenUrl);
 
                 productoDAO.update(productoAEditar);
 

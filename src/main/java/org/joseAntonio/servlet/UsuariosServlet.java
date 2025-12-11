@@ -26,10 +26,32 @@ public class UsuariosServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        String pathInfo = request.getPathInfo();
+
         UsuariosDAO usuariosDAO = new UsuariosDAOImpl();
         RequestDispatcher dispatcher = null; // Inicializar a null
 
-        String pathInfo = request.getPathInfo();
+        if ("/logout".equals(pathInfo)) {
+            jakarta.servlet.http.HttpSession session = request.getSession(false);
+
+            if (session != null) {
+                session.invalidate(); // Invalida la sesión
+            }
+
+            // Aquí sí usas el contextPath para la redirección externa:
+            response.sendRedirect(request.getContextPath() + "/tienda/productos");
+            return; // Detener la ejecución del doGet
+        }
+
+        // --- BLOQUE FALTANTE: Manejo del Login (mostrar el formulario) ---
+        if ("/login".equals(pathInfo)) {
+            // Esto reenvía (forward) la petición internamente a la vista de login.jsp.
+            // NO necesita contextPath porque es una ruta interna dentro del servidor.
+            dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/login.jsp");
+            dispatcher.forward(request, response);
+            return; // Detener la ejecución para que no intente listar usuarios
+        }
 
         // /tienda/usuarios/ - /tienda/usuarios (Listado general)
 
@@ -98,9 +120,7 @@ public class UsuariosServlet extends HttpServlet {
         }
     }
 
-    //REVISAR EDITAR
-    //REVISAR EDITAR
-    //REVISAR EDITAR
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -154,6 +174,39 @@ public class UsuariosServlet extends HttpServlet {
                 throw new RuntimeException(e);
             }
             response.sendRedirect(request.getContextPath() + "/tienda/usuarios");
+            return;
+        } else if (pathInfo != null && pathInfo.endsWith("/login")) {
+            String nombre = request.getParameter("nombre");
+            String contrasenia = request.getParameter("contrasenia");
+
+            // ------------------------------------------------------------------
+            // PASO CRUCIAL: Hashear la contraseña del formulario
+            // ------------------------------------------------------------------
+            String contraseniaHasheada;
+            try {
+                contraseniaHasheada = Utils.hashPassword(contrasenia);
+            } catch (NoSuchAlgorithmException e) {
+                // Manejo de error si el algoritmo SHA-256 no está disponible
+                throw new ServletException("Error de configuración de hashing", e);
+            }
+            // ------------------------------------------------------------------
+
+            // **USAR EL HASH** para buscar el usuario en la DB
+            Optional<Usuario> optUsuario = usuariosDAO.encontrarPorNombreYContrasenia(nombre, contraseniaHasheada);
+
+            if (optUsuario.isPresent()) {
+                // Login Exitoso: Establecer la sesión
+                request.getSession().setAttribute("usuarioLogueado", optUsuario.get());
+                System.out.println("✅ Usuario logueado: " + optUsuario.get().getNombre());
+
+                // 2. Corregir la redirección (ver punto 2)
+                response.sendRedirect(request.getContextPath() + "/tienda/productos");
+            } else {
+                // Login Fallido
+                request.setAttribute("errorLogin", "Usuario o contraseña incorrectos");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/login.jsp");
+                dispatcher.forward(request, response);
+            }
             return;
         }
 

@@ -1,3 +1,8 @@
+<%@ page import="org.joseAntonio.model.Usuario" %>
+<%
+    // Obtener el objeto Usuario de la sesión
+    Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+%>
 <nav class="navbar bg-success navbar-dark sticky-top shadow">
     <div class="container-fluid">
         <div>
@@ -13,5 +18,29 @@
                 </li>
             </ul>
         </div>
+
+        <%-- NUEVA PARTE: Login / Logout --%>
+        <div class="d-flex">
+            <%
+                if (usuarioLogueado != null) {
+            %>
+            <span class="navbar-text me-3 text-white">
+                Bienvenido, <strong><%= usuarioLogueado.getNombre() %></strong>
+            </span>
+            <a class="btn btn-outline-light" href="${pageContext.request.contextPath}/tienda/usuarios/logout">
+                Logout
+            </a>
+            <%
+            } else {
+            %>
+            <a class="btn btn-outline-light" href="${pageContext.request.contextPath}/tienda/usuarios/login">
+                Login
+            </a>
+            <%
+                }
+            %>
+        </div>
+        <%-- FIN NUEVA PARTE --%>
+
     </div>
 </nav>

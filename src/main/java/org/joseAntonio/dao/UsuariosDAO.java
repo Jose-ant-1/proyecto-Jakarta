@@ -11,5 +11,5 @@ public interface UsuariosDAO {
     public Optional<Usuario> find(int id);
     public void update(Usuario usuario);
     public void delete(int id);
-
+    Optional<Usuario> encontrarPorNombreYContrasenia(String nombre, String contrasenia);
 }
