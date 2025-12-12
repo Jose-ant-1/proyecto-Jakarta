@@ -12,7 +12,6 @@ public class PedidoDAOImpl extends AbstractDAOImpl implements PedidoDAO {
 
     private final DetallePedidosDAO detalleDAO = new DetallePedidosDAOImpl(); // NUEVO
 
-    @Override
     public int create(Pedido pedido) {
         Connection conn = null;
         PreparedStatement psPedido = null;
@@ -20,64 +19,50 @@ public class PedidoDAOImpl extends AbstractDAOImpl implements PedidoDAO {
 
         try {
             conn = connectDB();
+            conn.setAutoCommit(false); // Inicia la transacción
 
-            conn.setAutoCommit(false);
-
-             psPedido = conn.prepareStatement(
+            // Insertar el pedido
+            psPedido = conn.prepareStatement(
                     "INSERT INTO pedidos (usuario_id, importe) VALUES (?,?)",
-                    Statement.RETURN_GENERATED_KEYS);
-
+                    Statement.RETURN_GENERATED_KEYS
+            );
             psPedido.setInt(1, pedido.getUsuarioId());
             psPedido.setDouble(2, pedido.getImporte());
-
-            int rows = psPedido.executeUpdate();
-            if (rows == 0) {
-                throw new SQLException("No se pudo guardar el pedido, no se insertó ninguna fila.");
-            }
+            psPedido.executeUpdate();
 
             rsGenKey = psPedido.getGeneratedKeys();
             if (rsGenKey.next()) {
                 pedido.setId(rsGenKey.getInt(1));
-            } else {
-                throw new SQLException("Error al obtener el ID del pedido generado.");
             }
 
+            // Guardar detalles usando la misma conexión
             for (DetallePedidos detalle : pedido.getDetalles()) {
                 detalle.setPedidoId(pedido.getId());
             }
-
             detalleDAO.saveBatch(pedido.getDetalles(), conn);
 
-            conn.commit();
-
+            conn.commit(); // Commit solo después de todo
         } catch (SQLException | ClassNotFoundException e) {
             if (conn != null) {
-                try {
-                    System.err.println("Transaction is being rolled back due to error:");
-                    e.printStackTrace(); // <-- Es CRÍTICO ver esto en la consola para saber la CAUSA REAL
-                    conn.rollback();
-                } catch (SQLException excep) {
-                    System.err.println("Error durante el rollback: " + excep.getMessage());
-                }
+                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             }
-            throw new RuntimeException("Error al guardar el pedido y sus detalles. La transacción fue revertida.", e);
-
+            throw new RuntimeException("Error al guardar pedido y detalles", e);
         } finally {
-            // Asegurarse de cerrar recursos y RESTABLECER autoCommit
+            // Cerrar solo statement y resultset
             closeDb(null, psPedido, rsGenKey);
+
+            // Cerrar conexión al final
             if (conn != null) {
                 try {
-                    // Esto es CRÍTICO para no afectar futuras operaciones con la DB
                     conn.setAutoCommit(true);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                closeDb(conn, null, null); // Cerramos la conexión
+                    conn.close();
+                } catch (SQLException e) { e.printStackTrace(); }
             }
         }
 
         return pedido.getId();
     }
+
     @Override
     public List<Pedido> getAll() {
         Connection conn = null;

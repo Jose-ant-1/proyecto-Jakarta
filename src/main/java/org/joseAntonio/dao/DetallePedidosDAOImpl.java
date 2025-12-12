@@ -173,7 +173,7 @@ public class DetallePedidosDAOImpl extends AbstractDAOImpl implements DetallePed
             ps.executeBatch();
 
         } finally {
-            closeDb(conn, ps, null);
+            if (ps != null) ps.close();
         }
     }
 

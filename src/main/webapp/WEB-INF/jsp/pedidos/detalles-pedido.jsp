@@ -10,7 +10,7 @@
     <hr/>
 
     <a href="<%= request.getContextPath() %>/tienda/pedidos" class="btn btn-secondary mb-4">
-        ← Volver a Mis Pedidos
+        Volver a Mis Pedidos
     </a>
 
     <%
@@ -18,7 +18,8 @@
         List<DetallePedidos> detalles = (List<DetallePedidos>) request.getAttribute("detalles");
     %>
 
-    <h4>Pedido Nº <%= pedido.getId() %></h4>
+    <h4>Pedido <%= pedido.getId() %></h4>
+    <p>Realizado por el Usuario ID: <strong><%= pedido.getUsuarioId() %></strong></p>
     <h5 class="mb-4">Total: <%= String.format("%.2f euros", pedido.getImporte()) %></h5>
 
     <table class="table table-striped table-hover shadow">
