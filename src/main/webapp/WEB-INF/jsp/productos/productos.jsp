@@ -8,16 +8,10 @@
 <div class="container mt-5 mb-5">
 
     <%
-        // *****************************************************************
-        // 1. LÓGICA DE CONTROL DE ACCESO (ADMINISTRADOR) - SOLUCIÓN FINAL
-        // Se asume que el valor en la sesión es EXACTAMENTE "Administrador".
-        // *****************************************************************
-
-        String rolUsuario = (String) session.getAttribute("rol");
-        boolean esAdministrador = false; // Inicialmente, no es administrador
+        // LÓGICA DE CONTROL DE ACCESO (ADMINISTRADOR)
+        boolean esAdministrador = false;
 
         if (rolUsuario != null) {
-            // SOLUCIÓN: Comprobamos si el rol de la sesión es IGUAL a "Administrador" (sensible a mayúsculas)
             esAdministrador = "Administrador".equals(rolUsuario);
         }
     %>
@@ -27,9 +21,6 @@
         </div>
         <div class="col-md-6 text-end">
 
-            <%-- ***************************************************************** --%>
-            <%-- 2. RESTRICCIÓN: Botón 'Crear Nuevo Producto' solo para Administrador --%>
-            <%-- ***************************************************************** --%>
             <% if (esAdministrador) { %>
             <form action="${pageContext.request.contextPath}/tienda/productos/crear" method="get" class="d-inline">
                 <button type="submit" class="btn btn-success">
@@ -43,22 +34,18 @@
     <hr class="my-4"/>
 
     <%
-        // Obtener la lista de productos del request (cargada por ProductosServlet.doGet)
         List<Producto> listaProductos = (List<Producto>)request.getAttribute("listaProductos");
-        String contextPath = request.getContextPath(); // Definir contextPath una vez
+        String contextPath = request.getContextPath();
 
-        // Verificar si la lista no es nula y contiene elementos
         if (listaProductos != null && !listaProductos.isEmpty()) {
     %>
 
     <%-- CUADRÍCULA DE PRODUCTOS (Usando clases de Bootstrap: row y col) --%>
     <div class="row row-cols-1 row-cols-md-3 g-4">
         <%
-            // Iterar sobre la lista de productos
             for (Producto producto: listaProductos) {
         %>
 
-        <%-- Inicio de la Tarjeta/Cuadro para cada producto. Ocupa 4 columnas en desktop (3 por fila) --%>
         <div class="col">
             <div class="card h-100 shadow-sm">
 
@@ -95,9 +82,7 @@
                             </button>
                         </form>
 
-                        <%-- *********************************************************************** --%>
-                        <%-- 3. RESTRICCIÓN: Botones 'Editar' y 'Eliminar' solo para Administrador --%>
-                        <%-- *********************************************************************** --%>
+                        <%-- Botones Editar y 'Eliminar' solo para Administrador --%>
                         <% if (esAdministrador) { %>
                         <div class="btn-group">
                             <%-- Botón de Editar --%>
@@ -107,7 +92,7 @@
                                 </button>
                             </form>
 
-                            <%-- Botón de Eliminar (Confirmación removida) --%>
+                            <%-- Botón de Eliminar --%>
                             <form action="<%=contextPath%>/tienda/productos/eliminar/<%=producto.getId()%>" method="post">
                                 <button type="submit" class="btn btn-danger btn-sm">
                                     Eliminar
@@ -120,10 +105,9 @@
             </div>
         </div>
         <%
-            } // Fin del bucle for
+            }
         %>
     </div>
-    <%-- Fin de la Cuadrícula --%>
 
     <%
     } else {

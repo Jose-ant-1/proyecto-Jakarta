@@ -63,11 +63,9 @@ public class ProductosServlet extends HttpServlet {
                         dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/productos/productos.jsp");
                     }
                 } catch (NumberFormatException e) {
-                    // Manejar la excepción sin propagarla fuera
                     dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/productos/productos.jsp");
                 }
             } else {
-                // ruta desconocida
                 dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/productos/productos.jsp");
             }
 
@@ -76,7 +74,6 @@ public class ProductosServlet extends HttpServlet {
         if (dispatcher != null) {
             dispatcher.forward(request, response);
         } else {
-            // Este caso de error es poco probable si la lógica de arriba está bien
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error interno del servlet: No se pudo encontrar la vista.");
         }
     }
@@ -88,7 +85,6 @@ public class ProductosServlet extends HttpServlet {
         String pathInfo = request.getPathInfo();
         String contextPath = request.getContextPath();
 
-        // 1. Manejo de CREACIÓN: /tienda/productos/ o /tienda/productos/crear
         if (pathInfo == null || "/".equals(pathInfo) || "/crear".equals(pathInfo) || pathInfo.endsWith("/crear")) {
 
             String nombre = request.getParameter("nombre");
@@ -104,24 +100,17 @@ public class ProductosServlet extends HttpServlet {
                 nuevoProducto.setImagenUrl(imagenUrl);
                 productoDAO.create(nuevoProducto);
 
-                // Redirigir al listado principal (Post-Redirect-Get)
                 response.sendRedirect(contextPath + "/tienda/productos");
                 return;
 
             } catch (NumberFormatException e) {
-                // Manejo básico de error si el precio no es un número válido
                 System.err.println("Error al parsear el precio: " + e.getMessage());
-                // Podrías redirigir de vuelta al formulario de creación con un mensaje de error.
                 response.sendRedirect(contextPath + "/tienda/productos/crear?error=precioInvalido");
                 return;
             }
 
-            // 2. Manejo de EDICIÓN: /tienda/productos/editar/{id}
-            // Nota: En la vista de listado, el botón de editar dirige a /editar/{id} (GET), pero
-            // el formulario dentro de editar-producto.jsp debe hacer POST a /editar/{id} para este bloque.
         } else if (pathInfo.startsWith("/editar/")) {
             try {
-                // Extraer el ID de la URL: /editar/{id}
                 int id =  Integer.parseInt(pathInfo.substring("/editar/".length()));
 
                 Optional<Producto> productoOpt = productoDAO.find(id);
@@ -133,7 +122,6 @@ public class ProductosServlet extends HttpServlet {
 
                 Producto productoAEditar = productoOpt.get();
 
-                // Actualizar campos
                 String nuevoNombre = request.getParameter("nombre");
                 String nuevoPrecioStr = request.getParameter("precio");
                 String nuevoImagenUrl = request.getParameter("imagenUrl");
@@ -147,18 +135,14 @@ public class ProductosServlet extends HttpServlet {
                 productoDAO.update(productoAEditar);
 
             } catch (NumberFormatException e) {
-                // Error si el ID o el precio no son números
                 throw new ServletException("Error de formato al editar producto", e);
             }
 
-            // Redirigir al listado después de la edición
             response.sendRedirect(contextPath + "/tienda/productos");
             return;
 
-            // 3. Manejo de ELIMINACIÓN: /tienda/productos/eliminar/{id}
         } else if (pathInfo.startsWith("/eliminar/")) {
             try {
-                // Extraer el ID de la URL: /eliminar/{id}
                 int id =  Integer.parseInt(pathInfo.substring("/eliminar/".length()));
 
                 productoDAO.delete(id);
@@ -167,12 +151,10 @@ public class ProductosServlet extends HttpServlet {
                 throw new ServletException("Error de formato al eliminar producto (ID no válido)", e);
             }
 
-            // Redirigir al listado después de la eliminación
             response.sendRedirect(contextPath + "/tienda/productos");
             return;
         }
 
-        // Si llega aquí, es una ruta POST desconocida, redirigir al listado
         response.sendRedirect(contextPath + "/tienda/productos");
     }
 

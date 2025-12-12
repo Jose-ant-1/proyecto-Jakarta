@@ -1,10 +1,13 @@
 package org.joseAntonio.model;
 
+import java.util.List;
+
 public class Pedido {
 
     private int id;
     private int usuarioId;
     private double importe;
+    private List<DetallePedidos> detalles;
 
     public void setId(int id) {
         this.id = id;
@@ -27,4 +30,11 @@ public class Pedido {
         return importe;
     }
 
+    public List<DetallePedidos> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(List<DetallePedidos> detalles) {
+        this.detalles = detalles;
+    }
 }

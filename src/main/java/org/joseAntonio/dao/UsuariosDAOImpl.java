@@ -165,7 +165,6 @@ public class UsuariosDAOImpl extends AbstractDAOImpl implements UsuariosDAO {
 
         try {
             conn = connectDB();
-            // 1. Buscamos por el nombre y la columna 'password' de la base de datos.
             ps = conn.prepareStatement("SELECT * FROM usuarios WHERE nombre=? AND password=?");
 
             int idx = 1;
@@ -179,7 +178,6 @@ public class UsuariosDAOImpl extends AbstractDAOImpl implements UsuariosDAO {
                 usuario.setId(rs.getInt(idx++));
                 usuario.setNombre(rs.getString(idx++));
                 usuario.setRol(rs.getString(idx++));
-                // Aunque no es necesario devolver la contraseña, la asignamos para completar el objeto
                 usuario.setContrasenia(rs.getString(idx));
                 return Optional.of(usuario);
             }

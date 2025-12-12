@@ -21,8 +21,6 @@ public class UsuariosServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-// UsuariosServlet.java (Método doGet corregido)
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -30,7 +28,7 @@ public class UsuariosServlet extends HttpServlet {
         String pathInfo = request.getPathInfo();
 
         UsuariosDAO usuariosDAO = new UsuariosDAOImpl();
-        RequestDispatcher dispatcher = null; // Inicializar a null
+        RequestDispatcher dispatcher = null;
 
         if ("/logout".equals(pathInfo)) {
             jakarta.servlet.http.HttpSession session = request.getSession(false);
@@ -39,12 +37,10 @@ public class UsuariosServlet extends HttpServlet {
                 session.invalidate(); // Invalida la sesión
             }
 
-            // Aquí sí usas el contextPath para la redirección externa:
             response.sendRedirect(request.getContextPath() + "/tienda/productos");
-            return; // Detener la ejecución del doGet
+            return;
         }
 
-        // --- BLOQUE FALTANTE: Manejo del Login (mostrar el formulario) ---
         if ("/login".equals(pathInfo)) {
             // Esto reenvía (forward) la petición internamente a la vista de login.jsp.
             // NO necesita contextPath porque es una ruta interna dentro del servidor.
@@ -97,14 +93,10 @@ public class UsuariosServlet extends HttpServlet {
                         dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
                     }
                 } catch (NumberFormatException e) {
-                    // Si pathsParts[1] no es un número (ej: /tienda/usuarios/otro) -> Volver al listado
                     dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
                 }
 
-                // Ruta desconocida
-
             } else {
-                // Cualquier otra ruta no manejada, por defecto volvemos al listado
                 List<Usuario> usuarios = usuariosDAO.getAll();
                 request.setAttribute("listaUsuarios", usuarios);
                 dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/usuarios/usuarios.jsp");
@@ -115,7 +107,6 @@ public class UsuariosServlet extends HttpServlet {
         if (dispatcher != null) {
             dispatcher.forward(request, response);
         } else {
-            // En caso de que, por alguna razón, dispatcher siga siendo null (caso improbable con la lógica anterior)
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error interno del servlet.");
         }
     }
@@ -156,8 +147,6 @@ public class UsuariosServlet extends HttpServlet {
                 if (nuevaContrasenia != null && !nuevaContrasenia.isBlank()) {
                     usuario.setContrasenia(Utils.hashPassword(nuevaContrasenia));
                 }
-                // Si no se proporcionó una nueva, el objeto 'usuario' aún tendrá la
-                // contraseña hasheada existente de la base de datos.
 
                 usuariosDAO.update(usuario);
 
@@ -179,28 +168,21 @@ public class UsuariosServlet extends HttpServlet {
             String nombre = request.getParameter("nombre");
             String contrasenia = request.getParameter("contrasenia");
 
-            // ------------------------------------------------------------------
-            // PASO CRUCIAL: Hashear la contraseña del formulario
-            // ------------------------------------------------------------------
             String contraseniaHasheada;
             try {
                 contraseniaHasheada = Utils.hashPassword(contrasenia);
             } catch (NoSuchAlgorithmException e) {
-                // Manejo de error si el algoritmo SHA-256 no está disponible
                 throw new ServletException("Error de configuración de hashing", e);
             }
-            // ------------------------------------------------------------------
 
-            // **USAR EL HASH** para buscar el usuario en la DB
             Optional<Usuario> optUsuario = usuariosDAO.encontrarPorNombreYContrasenia(nombre, contraseniaHasheada);
 
             if (optUsuario.isPresent()) {
                 // Login Exitoso: Establecer la sesión
                 request.getSession().setAttribute("usuarioLogueado", optUsuario.get());
-                System.out.println("✅ Usuario logueado: " + optUsuario.get().getNombre());
+                System.out.println("Usuario logueado: " + optUsuario.get().getNombre());
                 request.getSession().setAttribute("rol", optUsuario.get().getRol());
 
-                // 2. Corregir la redirección (ver punto 2)
                 response.sendRedirect(request.getContextPath() + "/tienda/productos");
             } else {
                 // Login Fallido

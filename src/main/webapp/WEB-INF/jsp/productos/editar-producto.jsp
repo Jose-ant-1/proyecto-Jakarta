@@ -5,15 +5,12 @@
 <div class="container mt-5 mb-5">
 
     <%
-        // Obtener el objeto Producto del request (Cargado por ProductosServlet.doGet)
         Producto producto = (Producto) request.getAttribute("producto");
         String contextPath = request.getContextPath();
 
         if (producto != null) {
-            // La acción del formulario es la URL de edición
             String actionUrl = contextPath + "/tienda/productos/editar/" + producto.getId();
 
-            // 1. Lógica CLARA para la URL. Si es null, se usa cadena vacía.
             String imagenUrl = (producto.getImagenUrl() != null) ? producto.getImagenUrl() : "";
     %>
 
@@ -39,17 +36,14 @@
         <div class="mb-3 row">
             <label for="precio" class="col-sm-2 col-form-label fw-bold">Precio (€)</label>
             <div class="col-sm-10">
-                <%-- CORRECCIÓN DEL PRECIO: imprime el double directamente --%>
                 <input type="number" step="0.01" min="0" class="form-control" id="precio" name="precio"
                        value="<%= producto.getPrecio() %>" required>
             </div>
         </div>
 
-        <%-- Input para la URL de la Imagen --%>
         <div class="mb-3 row">
             <label for="imagenUrl" class="col-sm-2 col-form-label fw-bold">URL Imagen</label>
             <div class="col-sm-10">
-                <%-- Usa la variable 'imagenUrl' ya limpia arriba --%>
                 <input type="url" class="form-control" id="imagenUrl" name="imagenUrl"
                        value="<%= imagenUrl %>" placeholder="URL completa de la imagen">
             </div>
@@ -58,7 +52,7 @@
         <%-- Botones de Acción --%>
         <div class="mt-5 pt-3 border-top d-flex justify-content-end">
 
-            <%-- Botón Cancelar (AHORA VUELVE AL LISTADO COMPLETO) --%>
+            <%-- Botón Cancelar --%>
             <a href="<%=contextPath%>/tienda/productos/" class="btn btn-secondary me-3">
                 Cancelar
             </a>

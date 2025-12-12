@@ -1,7 +1,8 @@
 package org.joseAntonio.dao;
 
 import org.joseAntonio.model.DetallePedidos;
-
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,5 +12,6 @@ public interface DetallePedidosDAO {
     public Optional<DetallePedidos> find(int id);
     public void update(DetallePedidos detallePedido);
     public void delete(int id);
-
+    public void saveBatch(List<DetallePedidos> detalles, Connection conn) throws SQLException;
+    public List<DetallePedidos> findByPedidoId(int pedidoId);
 }

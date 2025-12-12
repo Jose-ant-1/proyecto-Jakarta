@@ -1,5 +1,7 @@
 package org.joseAntonio.model;
 
+import java.util.Objects;
+
 public class Producto {
 
     private int id;
@@ -44,5 +46,8 @@ public class Producto {
         return getId() == producto.getId();
     }
 
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 
 }

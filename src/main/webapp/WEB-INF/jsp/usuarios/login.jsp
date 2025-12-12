@@ -1,8 +1,7 @@
 <%@ page import="org.joseAntonio.model.Usuario" %>
 <%@ include file="/WEB-INF/jsp/fragmentos/header.jspf" %>
-<%-- Incluimos nav.jspf si queremos que aparezca el menú --%>
 <%@ include file="/WEB-INF/jsp/fragmentos/nav.jspf" %>
-<%-- Nota: El footer.jspf incluye el cierre de <body> y </html> --%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <div class="container mt-5" style="max-width: 500px;">
 

@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="/WEB-INF/jsp/fragmentos/header.jspf" %>
 <%@ include file="/WEB-INF/jsp/fragmentos/nav.jspf" %>
-<%-- Ya NO NECESITA enctype="multipart/form-data" --%>
 <div class="container mt-5" style="width: 50%;">
     <h1 class="mb-4">Crear Nuevo Producto</h1>
     <hr/>
@@ -16,7 +15,7 @@
         </div>
 
         <div class="mb-3 row">
-            <label for="precio" class="col-sm-3 col-form-label">Precio €:</label>
+            <label for="precio" class="col-sm-3 col-form-label">Precio en euros:</label>
             <div class="col-sm-9">
                 <input type="number" step="0.01" class="form-control" id="precio" name="precio" required min="0.01">
             </div>

@@ -1,6 +1,7 @@
 package org.joseAntonio.dao;
 
 import org.joseAntonio.model.DetallePedidos;
+import org.joseAntonio.model.Pedido;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -127,7 +128,6 @@ public class DetallePedidosDAOImpl extends AbstractDAOImpl implements DetallePed
         } finally {
             closeDb(conn, ps, rs);
         }
-
     }
 
     @Override
@@ -151,4 +151,66 @@ public class DetallePedidosDAOImpl extends AbstractDAOImpl implements DetallePed
             closeDb(conn, ps, rs);
         }
     }
+
+    @Override
+    public void saveBatch(List<DetallePedidos> detalles, Connection conn) throws SQLException {
+        PreparedStatement ps = null;
+
+        final String INSERT_DETALLE = "INSERT INTO detalle_pedidos (pedido_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)";
+
+        try {
+            ps = conn.prepareStatement(INSERT_DETALLE);
+
+            for (DetallePedidos detalle : detalles) {
+                int idx = 1;
+                ps.setInt(idx++, detalle.getPedidoId());
+                ps.setInt(idx++, detalle.getProductoId());
+                ps.setInt(idx++, detalle.getCantidad());
+                ps.setDouble(idx++, detalle.getPrecio());
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+
+        } finally {
+            closeDb(conn, ps, null);
+        }
+    }
+
+    @Override
+    public List<DetallePedidos> findByPedidoId(int pedidoId) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        List<DetallePedidos> detalles = new ArrayList<>();
+
+        try {
+            conn = connectDB();
+            ps = conn.prepareStatement(
+                    "SELECT id, pedido_id, producto_id, cantidad, precio_unitario FROM detalle_pedidos WHERE pedido_id = ?"
+            );
+
+            ps.setInt(1, pedidoId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                DetallePedidos detallePedido = new DetallePedidos();
+                int idx = 1;
+                // Asumo el orden de las columnas: id, pedido_id, producto_id, cantidad, precio
+                detallePedido.setId(rs.getInt(idx++));
+                detallePedido.setPedidoId(rs.getInt(idx++));
+                detallePedido.setProductoId(rs.getInt(idx++));
+                detallePedido.setCantidad(rs.getInt(idx++));
+                detallePedido.setPrecio(rs.getDouble(idx++));
+                detalles.add(detallePedido);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException("Error al buscar detalles por ID de pedido: " + pedidoId, e);
+        } finally {
+            closeDb(conn, ps, rs);
+        }
+        return detalles;
+    }
+
 }

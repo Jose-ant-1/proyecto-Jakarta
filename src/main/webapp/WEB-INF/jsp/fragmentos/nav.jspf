@@ -1,53 +1,55 @@
 <%@ page import="org.joseAntonio.model.Usuario" %>
+<%@ page import="org.joseAntonio.model.Producto" %>
+<%@ page import="java.util.Map" %>
 <%
     // Obtener el objeto Usuario de la sesión
-    Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado"); [cite_start]// [cite: 1]
+    Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
 
-    // ************************************************************
-    // * LÓGICA DE VISIBILIDAD DE CARRITO
-    // ************************************************************
+
+    // LÓGICA  VISIBILIDAD CARRITO
+
     String rolUsuario = null;
     if (usuarioLogueado != null) {
-    rolUsuario = usuarioLogueado.getRol();
+        rolUsuario = usuarioLogueado.getRol();
     }
 
     // El carrito es visible si el rol es NULO (no logueado) o es "Usuario"
     boolean esComprador = rolUsuario == null || "Usuario".equals(rolUsuario);
 
-    // Obtener contador del carrito desde la sesión (se asume que se guarda como "carritoContador")
-    Integer contador = (Integer) session.getAttribute("carritoContador");
-    if (contador == null) {
-    contador = 0;
+    // Obtener el carrito de la sesión (Map<Producto, Integer>)
+    Map<Producto, Integer> carritoNav = (Map<Producto, Integer>) session.getAttribute("carrito");
+
+    int contador = 0;
+    if (carritoNav != null) {
+        // Sumar las cantidades de todos los productos en el carrito
+        contador = carritoNav.values().stream().mapToInt(Integer::intValue).sum();
     }
 %>
-[cite_start]<nav class="navbar bg-success navbar-dark sticky-top shadow"> [cite: 2]
+<nav class="navbar bg-success navbar-dark sticky-top shadow">
 <div class="container-fluid">
     <div>
         <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex flex-row">
             <li class="nav-item me-3">
-                [cite_start]<a class="nav-link" href="${pageContext.request.contextPath}/tienda/productos/">Productos</a> [cite: 2]
+                <a class="nav-link" href="${pageContext.request.contextPath}/tienda/productos/">Productos</a>
             </li>
 
-            [cite_start]<li class="nav-item me-3"> [cite: 3]
-            [cite_start]<a class="nav-link" href="${pageContext.request.contextPath}/tienda/usuarios/">Usuarios</a> [cite: 3]
+            <li class="nav-item me-3">
+            <a class="nav-link" href="${pageContext.request.contextPath}/tienda/usuarios/">Usuarios</a>
         </li>
             <li class="nav-item">
-                [cite_start]<a class="nav-link" href="${pageContext.request.contextPath}/tienda/pedidos/">Pedidos</a> [cite: 3]
+                <a class="nav-link" href="${pageContext.request.contextPath}/tienda/pedidos/">Pedidos</a>
 
-                [cite_start]</li> [cite: 4]
+                </li>
         </ul>
     </div>
 
-    <%-- NUEVA PARTE: Carrito y Login / Logout --%>
+    <%-- Carrito y Login / Logout --%>
     <div class="d-flex">
 
-        <%-- ************************************************************ --%>
-        <%-- ** Botón de Carrito (Visible para NO Logueados o Usuarios) ** --%>
-        <%-- ************************************************************ --%>
         <% if (esComprador) { %>
         <form action="${pageContext.request.contextPath}/tienda/carrito/ver" method="get" class="d-inline me-3">
             <button type="submit" class="btn btn-outline-light position-relative">
-                🛒 Carrito
+                Carrito
                 <% if (contador > 0) { %>
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                             <%= contador %>
@@ -61,25 +63,22 @@
             if (usuarioLogueado != null) {
         %>
 
-        [cite_start]<span class="navbar-text me-3 text-white"> [cite: 5]
-                [cite_start]Bienvenido, <strong><%= usuarioLogueado.getNombre() %></strong> [cite: 5]
+        <span class="navbar-text me-3 text-white">
+                Bienvenido, <strong><%= usuarioLogueado.getNombre() %></strong>
             </span>
         <a class="btn btn-outline-light" href="${pageContext.request.contextPath}/tienda/usuarios/logout">
             Logout
         </a>
         <%
 
-            [cite_start]} else { [cite: 6]
+                } else {
         %>
         <a class="btn btn-outline-light" href="${pageContext.request.contextPath}/tienda/usuarios/login">
             Login
         </a>
         <%
             }
-
-            [cite_start]%> [cite: 7]
+        %>
     </div>
-    <%-- FIN NUEVA PARTE --%>
-
 </div>
 </nav>
